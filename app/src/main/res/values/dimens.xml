@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="mrg_3">3dp</dimen>
+    <dimen name="font_13">13sp</dimen>
+
+</resources>

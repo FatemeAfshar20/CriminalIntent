@@ -83,4 +83,29 @@ public class CrimeRepository implements IRepository {
 
         return 0;
     }
+
+    public Crime getFirst(){
+        return mCrimes.get(0);
+    }
+
+    public Crime getLast(){
+        return mCrimes.get(CRIME_SIZE-1);
+    }
+
+    public Crime getNext(UUID uuid){
+        int crimeIndex=getPosition(uuid);
+        if(crimeIndex<mCrimes.size()-1) {
+            return mCrimes.get(crimeIndex + 1);
+        } else {
+            return mCrimes.get(0);
+        }
+    }
+
+    public Crime getPrev(UUID uuid){
+        int crimeIndex=getPosition(uuid);
+        if(crimeIndex>0)
+            return mCrimes.get(crimeIndex-1);
+        else
+            return mCrimes.get(CRIME_SIZE-1);
+    }
 }

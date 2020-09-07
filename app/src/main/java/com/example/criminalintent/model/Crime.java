@@ -2,6 +2,7 @@ package com.example.criminalintent.model;
 
 import com.example.criminalintent.utils.DateUtils;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -10,6 +11,7 @@ public class Crime {
     private UUID mId;
     private String mTitle;
     private Date mDate;
+    private Date mTime;
     private boolean mSolved;
 
     public UUID getId() {
@@ -40,9 +42,18 @@ public class Crime {
         mSolved = solved;
     }
 
+    public Date getTime() {
+        return mTime;
+    }
+
+    public void setTime(Date time) {
+        mTime = time;
+    }
+
     public Crime() {
         mId = UUID.randomUUID();
         mDate = DateUtils.randomDate();
+        mTime=DateUtils.randomTime();
 //        mDate = new Date();
     }
 

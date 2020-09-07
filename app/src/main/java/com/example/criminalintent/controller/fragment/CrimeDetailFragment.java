@@ -1,8 +1,6 @@
 package com.example.criminalintent.controller.fragment;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -16,9 +14,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import com.example.criminalintent.R;
@@ -26,6 +22,8 @@ import com.example.criminalintent.model.Crime;
 import com.example.criminalintent.repository.CrimeRepository;
 import com.example.criminalintent.repository.IRepository;
 
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -35,13 +33,22 @@ public class CrimeDetailFragment extends Fragment {
     public static final String ARGS_CRIME_ID = "crimeId";
     public static final String FRAGMENT_TAG_DATE_PICKER = "DatePicker";
     public static final int REQUEST_CODE_DATE_PICKER = 0;
+    public static final String FRAGMENT_TAG_TIME_PICKER = "fragment tag time picker";
+    public static final int REQUEST_CODE_TIME_PICKER = 1;
 
     private EditText mEditTextTitle;
-    private Button mButtonDate;
+    private Button mButtonDate, mButtonTime,
+            mButtonFirst,mButtonLast,mButtonNext,mButtonPrev;
     private CheckBox mCheckBoxSolved;
+    private DateFormat mDateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+    private DateFormat mTimeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+
 
     private Crime mCrime;
     private IRepository mRepository;
+    private UUID mCrimeId;
+    private CrimeRepository mCrimeRepository=
+            CrimeRepository.getInstance();
 
     public static CrimeDetailFragment newInstance(UUID crimeId) {
 
@@ -66,14 +73,15 @@ public class CrimeDetailFragment extends Fragment {
         mRepository = CrimeRepository.getInstance();
 
         //this is storage of this fragment
-        UUID crimeId = (UUID) getArguments().getSerializable(ARGS_CRIME_ID);
-        mCrime = mRepository.getCrime(crimeId);
+        mCrimeId= (UUID) getArguments().getSerializable(ARGS_CRIME_ID);
+        mCrime = mRepository.getCrime(mCrimeId);
     }
 
     /**
      * 1. Inflate the layout (or create layout in code)
      * 2. find all views
      * 3. logic for all views (like setListeners)
+     *
      * @param inflater
      * @param container
      * @param savedInstanceState
@@ -109,22 +117,37 @@ public class CrimeDetailFragment extends Fragment {
 
         if (requestCode == REQUEST_CODE_DATE_PICKER) {
             Date userSelectedDate =
-                    (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_USER_SELECTED_DATE);
+                    (Date) data.getSerializableExtra(
+                            DatePickerFragment.EXTRA_USER_SELECTED_DATE);
 
             updateCrimeDate(userSelectedDate);
+        }
+        if(requestCode==REQUEST_CODE_TIME_PICKER){
+            Calendar userSelectedTime=
+                    (Calendar) data.getSerializableExtra(
+                            TimePickerFragment.EXTRA_TIME_SELECTED);
+            updateCrimeDate(userSelectedTime.getTime());
         }
     }
 
     private void findViews(View view) {
         mEditTextTitle = view.findViewById(R.id.crime_title);
         mButtonDate = view.findViewById(R.id.crime_date);
+        mButtonTime = view.findViewById(R.id.crime_time);
+        mButtonFirst=view.findViewById(R.id.btn_first);
+        mButtonLast=view.findViewById(R.id.btn_last);
+        mButtonNext=view.findViewById(R.id.btn_next);
+        mButtonPrev=view.findViewById(R.id.btn_prev);
         mCheckBoxSolved = view.findViewById(R.id.crime_solved);
+
     }
 
     private void initViews() {
+        //DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(getContext());
         mEditTextTitle.setText(mCrime.getTitle());
         mCheckBoxSolved.setChecked(mCrime.isSolved());
-        mButtonDate.setText(mCrime.getDate().toString());
+        mButtonDate.setText(mDateFormat.format(mCrime.getDate()));
+        mButtonTime.setText(DateFormat.getTimeInstance().format(mCrime.getTime()));
     }
 
     private void setListeners() {
@@ -170,6 +193,59 @@ public class CrimeDetailFragment extends Fragment {
                         FRAGMENT_TAG_DATE_PICKER);
             }
         });
+
+        mButtonTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerFragment timePickerFragment=
+                        TimePickerFragment.newInstance(mCrime.getTime());
+
+                timePickerFragment.setTargetFragment(
+                        CrimeDetailFragment.this,
+                        REQUEST_CODE_TIME_PICKER);
+
+                timePickerFragment.show(
+                        getActivity().getSupportFragmentManager(),
+                        FRAGMENT_TAG_TIME_PICKER);
+
+            }
+        });
+
+        mButtonFirst.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               mCrime= mCrimeRepository.getFirst();
+               mCrimeId=mCrime.getId();
+                initViews();
+            }
+        });
+
+        mButtonLast.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCrime= mCrimeRepository.getLast();
+                mCrimeId=mCrime.getId();
+                initViews();
+            }
+        });
+
+        mButtonNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCrime= mCrimeRepository.getNext(mCrime.getId());
+                mCrimeId=mCrime.getId();
+                initViews();
+            }
+        });
+
+        mButtonPrev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCrime= mCrimeRepository.getPrev(mCrime.getId());
+                mCrimeId=mCrime.getId();
+                initViews();
+            }
+        });
     }
 
     private void updateCrime() {
@@ -180,6 +256,7 @@ public class CrimeDetailFragment extends Fragment {
         mCrime.setDate(userSelectedDate);
         updateCrime();
 
-        mButtonDate.setText(mCrime.getDate().toString());
+        mButtonDate.setText(mDateFormat.format(mCrime.getDate()));
+        mButtonTime.setText(mTimeFormat.format(mCrime.getDate()));
     }
 }

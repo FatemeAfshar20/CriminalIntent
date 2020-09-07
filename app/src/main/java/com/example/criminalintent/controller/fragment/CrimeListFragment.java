@@ -20,11 +20,14 @@ import com.example.criminalintent.model.Crime;
 import com.example.criminalintent.repository.CrimeRepository;
 import com.example.criminalintent.repository.IRepository;
 
+import java.text.DateFormat;
 import java.util.List;
 
 public class CrimeListFragment extends Fragment {
 
     public static final String TAG = "CLF";
+    private DateFormat mDateFormat=DateFormat.getDateInstance(DateFormat.SHORT);
+    private DateFormat mTimeFormat=DateFormat.getTimeInstance(DateFormat.SHORT);
 
     private RecyclerView mRecyclerView;
     private CrimeAdapter mCrimeAdapter;
@@ -116,7 +119,8 @@ public class CrimeListFragment extends Fragment {
         public void bindCrime(Crime crime) {
             mCrime = crime;
             mTextViewTitle.setText(crime.getTitle());
-            mTextViewDate.setText(crime.getDate().toString());
+            mTextViewDate.setText("Date : "+ mDateFormat.format(mCrime.getDate())
+                    +"   Time : "+mTimeFormat.format(mCrime.getTime()));
             mImageViewSolved.setVisibility(crime.isSolved() ? View.VISIBLE : View.GONE);
         }
     }

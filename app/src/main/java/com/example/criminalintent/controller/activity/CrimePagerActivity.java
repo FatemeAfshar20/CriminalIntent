@@ -13,6 +13,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.criminalintent.R;
+import com.example.criminalintent.controller.animation.DepthPageTransformer;
+import com.example.criminalintent.controller.animation.ZoomOutPageTransformer;
 import com.example.criminalintent.controller.fragment.CrimeDetailFragment;
 import com.example.criminalintent.model.Crime;
 import com.example.criminalintent.repository.CrimeRepository;
@@ -60,6 +62,7 @@ public class CrimePagerActivity extends AppCompatActivity {
 
         int currentIndex = mRepository.getPosition(mCrimeId);
         mViewPagerCrimes.setCurrentItem(currentIndex);
+        mViewPagerCrimes.setPageTransformer(new DepthPageTransformer());
     }
 
     private class CrimePagerAdapter extends FragmentStateAdapter {
