@@ -22,10 +22,12 @@ import com.example.criminalintent.repository.IRepository;
 
 import java.text.DateFormat;
 import java.util.List;
+import java.util.UUID;
 
 public class CrimeListFragment extends Fragment {
 
     public static final String TAG = "CLF";
+    public static final String ARG_CRIME_ID = "Crime Id";
     private DateFormat mDateFormat=DateFormat.getDateInstance(DateFormat.SHORT);
     private DateFormat mTimeFormat=DateFormat.getTimeInstance(DateFormat.SHORT);
 
@@ -34,10 +36,12 @@ public class CrimeListFragment extends Fragment {
 
     private IRepository mRepository;
 
-    public static CrimeListFragment newInstance() {
+    private UUID mCrimeId;
+
+    public static CrimeListFragment newInstance(UUID uuid) {
 
         Bundle args = new Bundle();
-
+        args.putSerializable(ARG_CRIME_ID,uuid);
         CrimeListFragment fragment = new CrimeListFragment();
         fragment.setArguments(args);
         return fragment;
@@ -50,6 +54,9 @@ public class CrimeListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mCrimeId= (UUID) getArguments().
+                get(ARG_CRIME_ID);
 
         mRepository = CrimeRepository.getInstance();
     }
@@ -89,7 +96,7 @@ public class CrimeListFragment extends Fragment {
             mCrimeAdapter = new CrimeAdapter(crimes);
             mRecyclerView.setAdapter(mCrimeAdapter);
         } else {
-            mCrimeAdapter.notifyDataSetChanged();
+            mCrimeAdapter.notifyItemChanged(mRepository.getPosition(mCrimeId));
         }
     }
 
