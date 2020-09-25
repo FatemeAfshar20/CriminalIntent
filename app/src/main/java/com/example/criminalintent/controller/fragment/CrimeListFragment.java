@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.criminalintent.R;
 import com.example.criminalintent.controller.activity.CrimePagerActivity;
+import com.example.criminalintent.database.CrimeDBRepository;
 import com.example.criminalintent.model.Crime;
 import com.example.criminalintent.repository.CrimeRepository;
 import com.example.criminalintent.repository.IRepository;
@@ -34,7 +35,7 @@ public class CrimeListFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private CrimeAdapter mCrimeAdapter;
 
-    private IRepository mRepository;
+    private CrimeDBRepository mDatabase;
 
     private UUID mCrimeId;
 
@@ -58,7 +59,7 @@ public class CrimeListFragment extends Fragment {
         mCrimeId= (UUID) getArguments().
                 get(ARG_CRIME_ID);
 
-        mRepository = CrimeRepository.getInstance();
+        mDatabase = CrimeDBRepository.getInstance(getContext());
     }
 
     @Override
@@ -90,13 +91,13 @@ public class CrimeListFragment extends Fragment {
     }
 
     private void updateUI() {
-        List<Crime> crimes = mRepository.getCrimes();
+        List<Crime> crimes = mDatabase.getList();
 
         if (mCrimeAdapter == null) {
             mCrimeAdapter = new CrimeAdapter(crimes);
             mRecyclerView.setAdapter(mCrimeAdapter);
         } else {
-            mCrimeAdapter.notifyItemChanged(mRepository.getPosition(mCrimeId));
+            mCrimeAdapter.notifyItemChanged(mDatabase.getPosition(mCrimeId));
         }
     }
 
@@ -160,8 +161,7 @@ public class CrimeListFragment extends Fragment {
 
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
             View view = layoutInflater.inflate(R.layout.crime_row_list, parent, false);
-            CrimeHolder crimeHolder = new CrimeHolder(view);
-            return crimeHolder;
+            return new CrimeHolder(view);
         }
 
         @Override

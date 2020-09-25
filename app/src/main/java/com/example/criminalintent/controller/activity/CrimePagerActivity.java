@@ -14,11 +14,9 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.criminalintent.R;
 import com.example.criminalintent.controller.animation.DepthPageTransformer;
-import com.example.criminalintent.controller.animation.ZoomOutPageTransformer;
 import com.example.criminalintent.controller.fragment.CrimeDetailFragment;
+import com.example.criminalintent.database.CrimeDBRepository;
 import com.example.criminalintent.model.Crime;
-import com.example.criminalintent.repository.CrimeRepository;
-import com.example.criminalintent.repository.IRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +25,7 @@ public class CrimePagerActivity extends AppCompatActivity {
 
     public static final String EXTRA_CRIME_ID = "com.example.criminalintent.crimeId";
     public static final String TAG = "CPA";
-    private IRepository mRepository;
+    private CrimeDBRepository mDatabase;
     private UUID mCrimeId;
 
     private ViewPager2 mViewPagerCrimes;
@@ -44,7 +42,7 @@ public class CrimePagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crime_pager);
 
-        mRepository = CrimeRepository.getInstance();
+        mDatabase = CrimeDBRepository.getInstance(this);
         mCrimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
 
         findViews();
@@ -56,11 +54,11 @@ public class CrimePagerActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        List<Crime> crimes = mRepository.getCrimes();
+        List<Crime> crimes = mDatabase.getList();
         CrimePagerAdapter adapter = new CrimePagerAdapter(this, crimes);
         mViewPagerCrimes.setAdapter(adapter);
 
-        int currentIndex = mRepository.getPosition(mCrimeId);
+        int currentIndex = mDatabase.getPosition(mCrimeId);
         mViewPagerCrimes.setCurrentItem(currentIndex);
         mViewPagerCrimes.setPageTransformer(new DepthPageTransformer());
     }

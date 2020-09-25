@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.criminalintent.R;
+import com.example.criminalintent.database.CrimeDBRepository;
 import com.example.criminalintent.model.Crime;
 import com.example.criminalintent.repository.CrimeRepository;
 import com.example.criminalintent.repository.IRepository;
@@ -45,10 +46,9 @@ public class CrimeDetailFragment extends Fragment {
 
 
     private Crime mCrime;
-    private IRepository mRepository;
+    //private IRepository mRepository;
     private UUID mCrimeId;
-    private CrimeRepository mCrimeRepository=
-            CrimeRepository.getInstance();
+    private CrimeDBRepository mDatabase;
 
     public static CrimeDetailFragment newInstance(UUID crimeId) {
 
@@ -70,11 +70,13 @@ public class CrimeDetailFragment extends Fragment {
 
         Log.d(TAG, "onCreate");
 
-        mRepository = CrimeRepository.getInstance();
+        mDatabase = CrimeDBRepository.getInstance(getContext());
 
         //this is storage of this fragment
+        assert getArguments() != null;
         mCrimeId= (UUID) getArguments().getSerializable(ARGS_CRIME_ID);
-        mCrime = mRepository.getCrime(mCrimeId);
+        assert mCrimeId != null;
+        mCrime = (Crime) mDatabase.get(mCrimeId);
     }
 
     /**
@@ -214,7 +216,7 @@ public class CrimeDetailFragment extends Fragment {
         mButtonFirst.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               mCrime= mCrimeRepository.getFirst();
+               mCrime= mDatabase.getFirst();
                mCrimeId=mCrime.getId();
                 initViews();
             }
@@ -223,7 +225,7 @@ public class CrimeDetailFragment extends Fragment {
         mButtonLast.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCrime= mCrimeRepository.getLast();
+                mCrime= mDatabase.getLast();
                 mCrimeId=mCrime.getId();
                 initViews();
             }
@@ -232,7 +234,7 @@ public class CrimeDetailFragment extends Fragment {
         mButtonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCrime= mCrimeRepository.getNext(mCrime.getId());
+                mCrime= mDatabase.getNext(mCrime.getId());
                 mCrimeId=mCrime.getId();
                 initViews();
             }
@@ -241,7 +243,7 @@ public class CrimeDetailFragment extends Fragment {
         mButtonPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCrime= mCrimeRepository.getPrev(mCrime.getId());
+                mCrime= mDatabase.getPrev(mCrime.getId());
                 mCrimeId=mCrime.getId();
                 initViews();
             }
@@ -249,7 +251,7 @@ public class CrimeDetailFragment extends Fragment {
     }
 
     private void updateCrime() {
-        mRepository.updateCrime(mCrime);
+        mDatabase.update(mCrime);
     }
 
     private void updateCrimeDate(Date userSelectedDate) {
